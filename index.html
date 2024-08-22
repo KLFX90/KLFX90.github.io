@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moving Estimation MVP</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #videoElement { width: 100%; max-width: 640px; }
+        button { padding: 10px; margin: 10px 0; }
+        #result { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Moving Estimation MVP</h1>
+    <video id="videoElement" autoplay playsinline></video>
+    <br>
+    <button id="captureButton">Capture Items</button>
+    <div id="result"></div>
+
+    <script>
+        const videoElement = document.getElementById('videoElement');
+        const captureButton = document.getElementById('captureButton');
+        const resultDiv = document.getElementById('result');
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            videoElement.srcObject = stream;
+        }
+
+        function captureItems() {
+            // In a real MVP, this would send the image to a server for processing
+            // For now, we'll simulate item recognition and estimation
+            const recognizedItems = simulateItemRecognition();
+            const estimate = calculateEstimate(recognizedItems);
+            displayResults(recognizedItems, estimate);
+        }
+
+        function simulateItemRecognition() {
+            // This is a placeholder for actual AI recognition
+            return [
+                { name: 'Chair', quantity: 4 },
+                { name: 'Table', quantity: 1 },
+                { name: 'Box', quantity: 5 },
+                { name: 'Lamp', quantity: 2 }
+            ];
+        }
+
+        function calculateEstimate(items) {
+            let totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+            let boxesNeeded = Math.ceil(totalItems / 3);  // Assume 3 items per box on average
+            let personnelNeeded = Math.ceil(totalItems / 20);  // Assume 1 person per 20 items
+            let estimatedCost = boxesNeeded * 5 + personnelNeeded * 100;  // $5 per box, $100 per person
+
+            return { boxesNeeded, personnelNeeded, estimatedCost };
+        }
+
+        function displayResults(items, estimate) {
+            let itemList = items.map(item => `${item.name}: ${item.quantity}`).join('<br>');
+            resultDiv.innerHTML = `
+                <h2>Recognized Items:</h2>
+                ${itemList}
+                <h2>Estimate:</h2>
+                <p>Boxes needed: ${estimate.boxesNeeded}</p>
+                <p>Personnel needed: ${estimate.personnelNeeded}</p>
+                <p>Estimated cost: $${estimate.estimatedCost}</p>
+            `;
+        }
+
+        setupCamera();
+        captureButton.addEventListener('click', captureItems);
+    </script>
+</body>
+</html>
